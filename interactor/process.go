@@ -20,18 +20,26 @@ func StartPing(ctx context.Context, e *echo.Echo, r *service.Redis, p *service.P
 		if err != nil {
 			log.WithError(err).Error("Ping Local error")
 		}
-		log.Info(stats)
-		if stats.PacketLoss == 0 {
-			r.AddPingComplete(ctx, stats)
+		if stats != nil {
+			log.Info(stats)
+			if stats.PacketLoss == 0 {
+				r.AddPingComplete(ctx)
+			} else {
+				r.AddPingError(ctx)
+			}
 		}
 
 		stats, err = p.PingRemote()
 		if err != nil {
 			log.WithError(err).Error("Ping Remote error")
 		}
-		log.Info(stats)
-		if stats.PacketLoss == 0 {
-			r.AddPingError(ctx, stats)
+		if stats != nil {
+			log.Info(stats)
+			if stats.PacketLoss == 0 {
+				r.AddPingComplete(ctx)
+			} else {
+				r.AddPingError(ctx)
+			}
 		}
 
 		select {

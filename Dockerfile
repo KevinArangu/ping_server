@@ -11,6 +11,5 @@ WORKDIR /app
 RUN apk update && apk add tzdata ca-certificates
 COPY --from=go /app/stats_server /app/
 ENV PORT_HTTP=3000
-EXPOSE 3000:3000
 USER root:root
 ENTRYPOINT ["/app/stats_server"]

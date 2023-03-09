@@ -16,5 +16,17 @@
             "args": ["-test.v"],
             "asRoot": true,
         },
+        {
+            "name": "Run redis test",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/service/redis_test.go",
+            "env": {
+                "PORT_HTTP": "3000"
+            },
+            "args": ["-test.v"],
+            "asRoot": true,
+        },
     ]
 }

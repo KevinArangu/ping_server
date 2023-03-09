@@ -22,7 +22,7 @@ type Redis struct {
 
 func NewRedis() *Redis {
 	c := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     "192.168.0.103:6379",
 		Password: "",
 		DB:       0,
 	})
@@ -31,10 +31,10 @@ func NewRedis() *Redis {
 	}
 }
 
-func (r *Redis) AddPingComplete(c context.Context, ping interface{}) (int64, error) {
+func (r *Redis) AddPingComplete(c context.Context) (int64, error) {
 	ctx, cancel := context.WithTimeout(c, timeout)
 	defer cancel()
-	p := r.client.RPush(ctx, completedKey, ping)
+	p := r.client.Incr(ctx, completedKey)
 	if p.Err() != redis.Nil {
 		log.WithError(p.Err()).Error("Error in AddPingComplete")
 		return 0, p.Err()
@@ -42,10 +42,10 @@ func (r *Redis) AddPingComplete(c context.Context, ping interface{}) (int64, err
 	return p.Result()
 }
 
-func (r *Redis) AddPingError(c context.Context, ping interface{}) (int64, error) {
+func (r *Redis) AddPingError(c context.Context) (int64, error) {
 	ctx, cancel := context.WithTimeout(c, timeout)
 	defer cancel()
-	p := r.client.RPush(ctx, errorsKey, ping)
+	p := r.client.Incr(ctx, errorsKey)
 	if p.Err() != redis.Nil {
 		log.WithError(p.Err()).Error("Error in AddPingError")
 		return 0, p.Err()
