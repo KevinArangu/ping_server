@@ -12,7 +12,9 @@
             "program": "${workspaceFolder}/main.go",
             "env": {
                 "PORT_HTTP": "3000"
-            }
-        }
+            },
+            "args": ["-test.v"],
+            "asRoot": true,
+        },
     ]
 }
