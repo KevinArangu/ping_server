@@ -4,16 +4,18 @@ import (
 	"context"
 	"time"
 
+	"github.com/KevinArangu/stats_server/config"
 	"github.com/KevinArangu/stats_server/service"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
 )
 
-const sleepTime = time.Duration(10 * time.Second)
-
 var log = logrus.New()
 
-func StartPing(ctx context.Context, e *echo.Echo, r *service.Redis, p *service.Pinger) {
+func StartPing(c context.Context, e *echo.Echo, r *service.Redis, p *service.Pinger) {
+	ctx, cancel := context.WithCancel(c)
+	defer cancel()
+
 	log.Info("Start pings")
 	for {
 		stats, err := p.PingLocal()
@@ -23,9 +25,9 @@ func StartPing(ctx context.Context, e *echo.Echo, r *service.Redis, p *service.P
 		if stats != nil {
 			log.Info(stats)
 			if stats.PacketLoss == 0 {
-				r.AddPingComplete(ctx)
+				r.AddPingComplete(ctx, true)
 			} else {
-				r.AddPingError(ctx)
+				r.AddPingError(ctx, true)
 			}
 		}
 
@@ -36,16 +38,16 @@ func StartPing(ctx context.Context, e *echo.Echo, r *service.Redis, p *service.P
 		if stats != nil {
 			log.Info(stats)
 			if stats.PacketLoss == 0 {
-				r.AddPingComplete(ctx)
+				r.AddPingComplete(ctx, false)
 			} else {
-				r.AddPingError(ctx)
+				r.AddPingError(ctx, false)
 			}
 		}
 
 		select {
 		case <-ctx.Done():
 			break
-		case <-time.After(sleepTime):
+		case <-time.After(config.SleepTime()):
 		}
 	}
 

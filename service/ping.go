@@ -1,16 +1,8 @@
 package service
 
 import (
-	"time"
-
+	"github.com/KevinArangu/stats_server/config"
 	"github.com/go-ping/ping"
-)
-
-const (
-	LocalPingerAddress  = "192.168.0.1"
-	RemotePingerAddress = "1.1.1.1"
-	PingDuration        = time.Duration(1 * time.Second)
-	PingCount           = 1
 )
 
 type Pinger struct{}
@@ -22,12 +14,13 @@ func NewPinger() *Pinger {
 }
 
 func (p *Pinger) PingLocal() (*ping.Statistics, error) {
-	local, err := ping.NewPinger(LocalPingerAddress)
+	local, err := ping.NewPinger(config.LocalPingAddress())
 	if err != nil {
+		log.WithField("addr", config.LocalPingAddress()).Error("Error in PingLocal")
 		return nil, err
 	}
-	local.Count = PingCount
-	local.Timeout = PingDuration
+	local.Count = config.PingCount()
+	local.Timeout = config.PingDuration()
 	local.SetPrivileged(true)
 	err = local.Run()
 	if err != nil {
@@ -38,12 +31,13 @@ func (p *Pinger) PingLocal() (*ping.Statistics, error) {
 }
 
 func (p *Pinger) PingRemote() (*ping.Statistics, error) {
-	remote, err := ping.NewPinger(RemotePingerAddress)
+	remote, err := ping.NewPinger(config.RemotePingAddress())
 	if err != nil {
+		log.WithField("addr", config.RemotePingAddress()).Error("Error in PingRemote")
 		return nil, err
 	}
-	remote.Count = PingCount
-	remote.Timeout = PingDuration
+	remote.Count = config.PingCount()
+	remote.Timeout = config.PingDuration()
 	remote.SetPrivileged(true)
 	err = remote.Run()
 	if err != nil {

@@ -14,15 +14,18 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var log = logrus.New()
+
 func main() {
 	ctx := context.Background()
-	log := logrus.New()
-	e := echo.New()
-	r := service.NewRedis()
-	p := service.NewPinger()
-
 	if err := config.ReadConfig(); err != nil {
 		log.WithError(err).Fatal("ENVS error")
+	}
+	e := echo.New()
+	p := service.NewPinger()
+	r, err := service.NewRedis()
+	if err != nil {
+		log.WithError(err).Fatal("Failed to create a Redis client")
 	}
 
 	router.CreateRoutes(e)
@@ -36,7 +39,7 @@ func main() {
 
 	go interactor.StartPing(ctx, e, r, p)
 
-	err := e.Start(config.ServerAddress())
+	err = e.Start(config.ServerAddress())
 	if err != nil {
 		log.WithError(err).Fatal("Server error")
 	}

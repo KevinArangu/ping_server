@@ -1,3 +1,7 @@
 ### Get ping
 GET http://localhost:3000/ping
 Content-Type: "application/json"
+
+### Get stats
+GET http://localhost:3000/stats
+Content-Type: "application/json"
