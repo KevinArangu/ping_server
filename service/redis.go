@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/KevinArangu/stats_server/config"
 	"github.com/KevinArangu/stats_server/model"
@@ -10,6 +11,8 @@ import (
 )
 
 const (
+	isRemoteConected     = "is_remote_conected"
+	isLocalConected      = "is_local_conected"
 	totalPings           = "total_pings"
 	totalLocalPings      = "total_local_pings"
 	totalRemotePings     = "total_remote_pings"
@@ -47,6 +50,10 @@ func (r *Redis) AddPingComplete(ctx context.Context, isRemotePing bool) (int64, 
 	var result int64
 	var err error
 	if isRemotePing {
+		ic := r.client.Set(ctx, isRemoteConected, 1, 1*time.Hour)
+		if ic.Err() != nil {
+			log.WithError(ic.Err()).Error("Error in AddPingComplete (isRemoteConected)")
+		}
 		t := r.client.Incr(ctx, totalPings)
 		if t.Err() != nil {
 			log.WithError(t.Err()).Error("Error in AddPingComplete (totalPings)")
@@ -64,6 +71,10 @@ func (r *Redis) AddPingComplete(ctx context.Context, isRemotePing bool) (int64, 
 		result = res
 		err = er
 	} else {
+		ic := r.client.Set(ctx, isLocalConected, 1, 1*time.Hour)
+		if ic.Err() != nil {
+			log.WithError(ic.Err()).Error("Error in AddPingComplete (isLocalConected)")
+		}
 		t := r.client.Incr(ctx, totalPings)
 		if t.Err() != nil {
 			log.WithError(t.Err()).Error("Error in AddPingComplete (totalPings)")
@@ -88,6 +99,10 @@ func (r *Redis) AddPingError(ctx context.Context, isRemotePing bool) (int64, err
 	var result int64
 	var err error
 	if isRemotePing {
+		ic := r.client.Set(ctx, isRemoteConected, 0, 1*time.Hour)
+		if ic.Err() != nil {
+			log.WithError(ic.Err()).Error("Error in AddPingComplete (isRemoteConected)")
+		}
 		t := r.client.Incr(ctx, totalPings)
 		if t.Err() != nil {
 			log.WithError(t.Err()).Error("Error in AddPingError (totalPings)")
@@ -105,6 +120,10 @@ func (r *Redis) AddPingError(ctx context.Context, isRemotePing bool) (int64, err
 		result = res
 		err = er
 	} else {
+		ic := r.client.Set(ctx, isLocalConected, 0, 1*time.Hour)
+		if ic.Err() != nil {
+			log.WithError(ic.Err()).Error("Error in AddPingComplete (isLocalConected)")
+		}
 		t := r.client.Incr(ctx, totalPings)
 		if t.Err() != nil {
 			log.WithError(t.Err()).Error("Error in AddPingError (totalPings)")
@@ -127,7 +146,8 @@ func (r *Redis) AddPingError(ctx context.Context, isRemotePing bool) (int64, err
 
 func (r *Redis) GetStats(ctx context.Context) (model.StatsResponse, error) {
 	var tp, tlp, trp, clp, crp, elp, erp string
-	mg := r.client.MGet(ctx, totalPings, totalLocalPings, totalRemotePings, completedLocalPings, completedRemotePings, errorsLocalPings, errorsRemotePings)
+	var ilc, irc bool
+	mg := r.client.MGet(ctx, totalPings, totalLocalPings, totalRemotePings, completedLocalPings, completedRemotePings, errorsLocalPings, errorsRemotePings, isLocalConected, isRemoteConected)
 	if mg.Err() != nil {
 		return model.StatsResponse{}, mg.Err()
 	}
@@ -153,6 +173,16 @@ func (r *Redis) GetStats(ctx context.Context) (model.StatsResponse, error) {
 	if values[6] != nil {
 		erp = values[6].(string)
 	}
+	if values[7] != nil {
+		if values[7] == "1" {
+			ilc = true
+		}
+	}
+	if values[8] != nil {
+		if values[8] == "1" {
+			irc = true
+		}
+	}
 
 	return model.StatsResponse{
 		TotalPings:           tp,
@@ -162,5 +192,7 @@ func (r *Redis) GetStats(ctx context.Context) (model.StatsResponse, error) {
 		CompletedRemotePings: crp,
 		ErrorLocalPings:      elp,
 		ErrorRemotePings:     erp,
+		IsLocalConected:      ilc,
+		IsRemoteConected:     irc,
 	}, nil
 }

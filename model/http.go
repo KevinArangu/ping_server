@@ -13,4 +13,6 @@ type StatsResponse struct {
 	TotalRemotePings     string `json:"total_remote_pings"`
 	CompletedRemotePings string `json:"completed_remote_pings"`
 	ErrorRemotePings     string `json:"error_remote_pings"`
+	IsLocalConected      bool   `json:"is_local_conected"`
+	IsRemoteConected     bool   `json:"is_remote_conected"`
 }
