@@ -5,3 +5,10 @@ services:
     restart: always
     ports:
       - 6379:6379
+      
+  stats:
+    container_name: stats_container
+    build: .
+    ports:
+      - 3000:3000
+      - 6379
