@@ -28,20 +28,15 @@ func main() {
 	if err != nil {
 		log.WithError(err).Fatal("Failed to create a Redis client")
 	}
-
 	e.Use(middleware.StaticMiddleware())
-
 	router.CreateRoutes(e)
-
 	go func() {
 		quit := make(chan os.Signal, 1)
 		signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 		<-quit
 		e.Shutdown(ctx)
 	}()
-
 	go interactor.StartPing(ctx, e, r, p)
-
 	err = e.Start(config.ServerAddress())
 	if err != nil {
 		log.WithError(err).Fatal("Server error")
