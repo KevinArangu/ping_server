@@ -8,6 +8,7 @@ import (
 
 	"github.com/KevinArangu/stats_server/config"
 	"github.com/KevinArangu/stats_server/interactor"
+	"github.com/KevinArangu/stats_server/middleware"
 	"github.com/KevinArangu/stats_server/router"
 	"github.com/KevinArangu/stats_server/service"
 	"github.com/labstack/echo"
@@ -27,6 +28,8 @@ func main() {
 	if err != nil {
 		log.WithError(err).Fatal("Failed to create a Redis client")
 	}
+
+	e.Use(middleware.StaticMiddleware())
 
 	router.CreateRoutes(e)
 
