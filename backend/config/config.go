@@ -21,6 +21,7 @@ type config struct {
 	PingDuration      int    `env:"PING_DURATION,required"`
 	PingCount         int    `env:"PING_COUNT,required"`
 	SleepTime         int    `env:"SLEEP_TIME,required"`
+	FrontendDirectory string `env:"FRONTEND_DIRECTORY,required"`
 }
 
 var c config
@@ -70,4 +71,8 @@ func PingCount() int {
 
 func SleepTime() time.Duration {
 	return time.Duration(time.Duration(c.SleepTime) * time.Second)
+}
+
+func FrontendDirectory() string {
+	return c.FrontendDirectory
 }

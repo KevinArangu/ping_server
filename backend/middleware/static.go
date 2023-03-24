@@ -3,13 +3,14 @@ package middleware
 import (
 	"strings"
 
+	"github.com/KevinArangu/stats_server/config"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
 
 func StaticMiddleware() echo.MiddlewareFunc {
 	configs := middleware.StaticConfig{
-		Root:    "front",
+		Root:    config.FrontendDirectory(),
 		Browse:  true,
 		HTML5:   true,
 		Skipper: StaticSkipper,
