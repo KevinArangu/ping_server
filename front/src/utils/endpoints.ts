@@ -1,3 +1,6 @@
+import { API_URL } from "@/configs";
+
 export const endpoints = {
-    getPokemon: (name: string) => `https://pokeapi.co/api/v2/pokemon/${name}`
+    getStats: () => `${API_URL}/stats`,
+    getAPIPing: () => `${API_URL}/ping`,
 }

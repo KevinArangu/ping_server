@@ -1,6 +1,6 @@
 import fetcher from "@/utils/fetcher"
 import useSWR  from "swr"
 
-export default function useFetch(url:string) {
-    return useSWR(url, fetcher, { refreshInterval: 60000 })
+export default function useFetch<T>(url:string) {
+    return useSWR<T>(url, fetcher, { refreshInterval: 10000 })
 }
