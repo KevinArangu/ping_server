@@ -28,6 +28,7 @@ func main() {
 	if err != nil {
 		log.WithError(err).Fatal("Failed to create a Redis client")
 	}
+	e.Use(middleware.CorsMiddleware())
 	e.Use(middleware.StaticMiddleware())
 	router.CreateRoutes(e)
 	go func() {
