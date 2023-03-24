@@ -1,15 +1,15 @@
-FROM golang:alpine AS go
+FROM golang:alpine AS backend
 WORKDIR /app
-COPY go.mod go.sum /app/
+COPY ./backend/go.mod ./backend/go.sum /app/
 RUN go mod download
-COPY . /app/
+COPY ./backend /app/
 RUN go build -o stats_server
 
-FROM node:alpine AS node
+FROM node:alpine AS frontend
 WORKDIR /app
-COPY ./front/package.json /app/
+COPY ./frontend/package.json /app/
 RUN npm i
-COPY ./front /app/
+COPY ./frontend /app/
 RUN npm run build
 
 FROM alpine 
@@ -24,8 +24,9 @@ ENV REMOTE_PING_ADDRESS="1.1.1.1"
 ENV PING_DURATION=1
 ENV PING_COUNT=1
 ENV SLEEP_TIME=10
+ENV FRONTEND_DIRECTORY=frontend
 USER root:root
 RUN apk update && apk add tzdata ca-certificates
-COPY --from=go /app/stats_server /app/
-COPY --from=node /app/out/ /app/front
-ENTRYPOINT ["/app/stats_server"]
+COPY --from=backend /app/stats_server /app/backend/
+COPY --from=frontend /app/out/ /app/frontend
+ENTRYPOINT ["/app/backend/stats_server"]
