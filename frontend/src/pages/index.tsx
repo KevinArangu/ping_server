@@ -18,9 +18,9 @@ const Home: FC = () => {
       <PageTitle>Estadísticas de mi red</PageTitle>
       <div className="flex flex-col mt-12 space-y-4 md:space-y-6">
         <GridStates>
-          <StateCard title="Estado del API" isOK={ping.ok} />
-          <StateCard title="Estado del gateway" isOK={stats.is_local_conected} />
-          <StateCard title="Estado remoto" isOK={stats.is_remote_conected} />
+          <StateCard title="Estado del API" isOK={ping ? ping.ok : undefined} />
+          <StateCard title="Estado del gateway" isOK={stats ? stats.is_local_conected : undefined} />
+          <StateCard title="Estado remoto" isOK={stats ? stats.is_remote_conected : undefined} />
         </GridStates>
         <GridPings>
           <ProgressCard 

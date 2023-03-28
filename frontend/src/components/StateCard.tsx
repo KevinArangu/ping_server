@@ -2,10 +2,9 @@ import { BaseBar, Box, ColorBar, Count, Percent, Statistics, Title } from "@/sty
 import { FC, useCallback, useMemo } from "react"
 
     
-type PercentMode = "floor" | "ceil"; 
 interface Props {
     title: string;
-    isOK: boolean;
+    isOK?: boolean;
 }
 
 const StateCard: FC<Props> = ({ title, isOK }) => {    
