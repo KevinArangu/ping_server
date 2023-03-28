@@ -1,16 +1,17 @@
+import ConectionStatus from "@/components/ConectionStatus"
 import useFetch from "@/hooks/useFetch"
 import { PingResponse } from "@/models/ping"
 import { StatsResponse } from "@/models/stats"
+import { Container } from "@/styles/components/ConnectionsStatuses"
 import { endpoints } from "@/utils/endpoints"
 import { FC } from "react"
-import ConectionStatus from "./ConectionStatus"
 
 const ConectionsStatuses: FC = () => {
     const {data: stats, error: sError, isLoading: sIsloading} = useFetch<StatsResponse>(endpoints.getStats())
     const {data: ping, error: pError, isLoading: pIsLoading} = useFetch<PingResponse>(endpoints.getAPIPing())
 
     return (
-        <div className="flex items-center space-x-2">
+        <Container>
             {ping && <ConectionStatus ok={ping.ok}>API</ConectionStatus>}
 
             {stats && (
@@ -19,7 +20,7 @@ const ConectionsStatuses: FC = () => {
                 <ConectionStatus ok={stats.is_remote_conected}>Remoto</ConectionStatus>
             </>
             )}
-        </div>
+        </Container>
     )
 }
 
